@@ -1,0 +1,38 @@
+<link rel="import" href="../../../frontend/bower_components/polymer/polymer-element.html">
+
+<dom-module id="_TagDash_">
+
+  <template>
+
+    <style>
+      :host {
+        display: inline-block;
+      }
+    </style>
+  </template>
+
+  <script>
+    class _TagCamel_ extends Polymer.Element {
+      static get is() {
+        return '_TagDash_';
+      }
+      static get properties() {
+        return {
+        }
+      }
+      constructor() {
+        super();
+      }
+      connectedCallback() {
+        // Hack needed to make Flow do lookup correctly
+        document.body.$ = {"_Id_": this};
+        console.log('connected', this);
+      }
+      disconnectedCallback() {
+        console.log('disconnected', this);
+      }
+    }
+    customElements.define(_TagCamel_.is, _TagCamel_);
+  </script>
+
+</dom-module>
