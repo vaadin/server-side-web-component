@@ -7,6 +7,7 @@ import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.internal.UIInternals;
 import com.vaadin.flow.di.Instantiator;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.internal.ReflectTools;
 import com.vaadin.flow.internal.nodefeature.NodeProperties;
 import com.vaadin.flow.router.Router;
@@ -48,9 +49,12 @@ public class SSWCUI extends UI {
         HasElement wcInstance = (HasElement) Instantiator.get(this)
                 .getOrCreate(wcClass);
 
+        Element wcElement = new Element(tag);
+        wcElement.appendChild(wcInstance.getElement());
+
         getElement().getStateProvider().appendVirtualChild(
-                getElement().getNode(), wcInstance.getElement(),
-                NodeProperties.INJECT_BY_ID, wcElementId);
+                getElement().getNode(), wcElement, NodeProperties.INJECT_BY_ID,
+                wcElementId);
 
     }
 }

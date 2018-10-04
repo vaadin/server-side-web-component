@@ -28,7 +28,6 @@ import javax.servlet.annotation.HandlesTypes;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasElement;
-import com.vaadin.flow.component.Tag;
 
 @HandlesTypes({ WebComponent.class })
 public class WebComponentInitializer implements ServletContainerInitializer {
@@ -39,7 +38,7 @@ public class WebComponentInitializer implements ServletContainerInitializer {
 
         Map<String, Class<? extends HasElement>> tagToWc = c.stream()
                 .collect(Collectors.toMap(
-                        type -> type.getAnnotation(Tag.class).value()
+                        type -> type.getAnnotation(WebComponent.class).value()
                                 .toLowerCase(Locale.ROOT),
                         type -> type.asSubclass(Component.class)));
         ctx.setAttribute(WebComponentInitializer.class.getName(), tagToWc);

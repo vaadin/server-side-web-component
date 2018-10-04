@@ -29,7 +29,6 @@ import javax.servlet.ServletContext;
 import org.apache.commons.io.IOUtils;
 
 import com.vaadin.flow.component.HasElement;
-import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.BootstrapHandler;
 import com.vaadin.flow.server.VaadinRequest;
@@ -164,7 +163,7 @@ public class SsWcHandler extends BootstrapHandler {
     }
 
     private String getTag(Class<?> webComponentClass) {
-        Tag ann = webComponentClass.getAnnotation(Tag.class);
+        WebComponent ann = webComponentClass.getAnnotation(WebComponent.class);
         return ann.value();
     }
 }

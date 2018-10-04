@@ -9,6 +9,7 @@
         display: inline-block;
       }
     </style>
+    <slot></slot>
   </template>
 
   <script>
@@ -24,8 +25,9 @@
         super();
       }
       connectedCallback() {
+        super.connectedCallback();
         // Hack needed to make Flow do lookup correctly
-        document.body.$ = {"_Id_": this};
+        document.body.$ = { "_Id_": this };
         console.log('connected', this);
       }
       disconnectedCallback() {
