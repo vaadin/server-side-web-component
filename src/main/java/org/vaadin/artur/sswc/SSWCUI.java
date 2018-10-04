@@ -14,11 +14,17 @@ import com.vaadin.flow.theme.ThemeDefinition;
 import com.vaadin.flow.theme.lumo.Lumo;
 
 public class SSWCUI extends UI {
+    private Class<?> theme = Lumo.class;;
+
     public SSWCUI() {
+        assignTheme();
+    }
+
+    private void assignTheme() {
         try {
             Field field = UIInternals.class.getDeclaredField("theme");
             field.setAccessible(true);
-            field.set(getInternals(), ReflectTools.createInstance(Lumo.class));
+            field.set(getInternals(), ReflectTools.createInstance(theme));
         } catch (NoSuchFieldException | SecurityException
                 | IllegalArgumentException | IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -33,7 +39,7 @@ public class SSWCUI extends UI {
     @Override
     public Optional<ThemeDefinition> getThemeFor(Class<?> navigationTarget,
             String path) {
-        return Optional.of(new ThemeDefinition(Lumo.class, ""));
+        return Optional.empty();
     }
 
     public void mapWc(Class<?> wcClass, String tag, String wcElementId) {
