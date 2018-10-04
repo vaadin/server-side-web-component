@@ -48,7 +48,7 @@ public class SsWcHandler extends BootstrapHandler {
     private static AtomicInteger sswcId = new AtomicInteger(1);
 
     private static String getTemplate() {
-        if (template == null) {
+        if (true || template == null) {
             try {
                 template = IOUtils.toString(
                         SsWcHandler.class.getResourceAsStream("wc.html"),
