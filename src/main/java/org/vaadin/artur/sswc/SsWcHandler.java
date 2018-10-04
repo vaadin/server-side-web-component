@@ -41,22 +41,23 @@ import com.vaadin.flow.shared.util.SharedUtil;
 public class SsWcHandler extends BootstrapHandler {
 
     private static final String PATH_PREFIX = "/sswc/";
-    private String template;
-    private ThreadLocal<Class<?>> currentWebComponentClass = new ThreadLocal<>();
-    private ThreadLocal<String> currentWebComponentId = new ThreadLocal<>();
+    private static String template;
+
+    private ThreadLocal<RequestInfo> currentInfo = new ThreadLocal<>();
+
     private static AtomicInteger sswcId = new AtomicInteger(1);
 
-    private String getTemplate() {
-        if (true || this.template == null) {
+    private static String getTemplate() {
+        if (template == null) {
             try {
-                this.template = IOUtils.toString(
-                        getClass().getResourceAsStream("wc.html"),
+                template = IOUtils.toString(
+                        SsWcHandler.class.getResourceAsStream("wc.html"),
                         StandardCharsets.UTF_8);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        return this.template;
+        return template;
     }
 
     @Override
@@ -66,13 +67,18 @@ public class SsWcHandler extends BootstrapHandler {
         BootstrapContext context = super.createAndInitUI(SSWCUI.class, request,
                 response, session);
 
-        Class<?> wcClass = currentWebComponentClass.get();
-        String tag = getTag(wcClass);
-        String wcElementId = currentWebComponentId.get();
-        ((SSWCUI) context.getUI()).mapWc(currentWebComponentClass.get(), tag,
-                wcElementId);
+        RequestInfo info = currentInfo.get();
+        ((SSWCUI) context.getUI()).mapWc(info.webComponentClass, info.tag,
+                info.id);
 
         return context;
+    }
+
+    public static class RequestInfo {
+        private String tag;
+        private String id;
+        private boolean elementRequest;
+        Class<? extends HasElement> webComponentClass;
     }
 
     @Override
@@ -89,62 +95,65 @@ public class SsWcHandler extends BootstrapHandler {
             return false;
         }
 
-        // This is a prototype. Real code should not depend on servlet details
-        // here
+        RequestInfo info = parseRequestInfo(request, pathInfo);
+        if (info == null) {
+            response.sendError(404, "No such web component");
+            return true;
+        }
+
+        currentInfo.set(info);
+        if (info.elementRequest) {
+            generateModule(response.getOutputStream(), info);
+            return true;
+        } else {
+            super.synchronizedHandleRequest(session, request, response);
+        }
+        currentInfo.remove();
+
+        return true;
+
+    }
+
+    private static RequestInfo parseRequestInfo(VaadinRequest request,
+            String pathInfo) {
         ServletContext context = ((VaadinServletRequest) request)
                 .getServletContext();
 
         String tail = pathInfo.substring(PATH_PREFIX.length());
-
         if (!tail.endsWith(".html")) {
-            response.sendError(404, "No such file");
-            return true;
+            return null;
         }
 
+        RequestInfo info = new RequestInfo();
         if (tail.startsWith("element/")) {
+            info.elementRequest = true;
+
             tail = tail.substring("element/".length());
-            String id = tail.substring(0, tail.indexOf("/"));
-            tail = tail.substring(id.length() + 1);
-            currentWebComponentId.set(id);
-            String tagName = tail.substring(0,
-                    tail.length() - ".html".length());
-            Optional<Class<? extends HasElement>> webComponentClass = WebComponentInitializer
-                    .getWebComponentClass(context, tagName);
-            if (!webComponentClass.isPresent()) {
-                response.sendError(404, "No such web component");
-                return true;
-            }
-            generateModule(response.getOutputStream(), tagName,
-                    webComponentClass.get());
-            return true;
+            info.id = tail.substring(0, tail.indexOf("/"));
+            tail = tail.substring(info.id.length() + 1);
+            info.tag = tail.substring(0, tail.length() - ".html".length());
+        } else {
+            info.tag = tail.substring(0, tail.length() - ".html".length());
+            info.id = "sswc_" + sswcId.incrementAndGet();
         }
-
-        String tagName = tail.substring(0, tail.length() - ".html".length());
-
         Optional<Class<? extends HasElement>> webComponentClass = WebComponentInitializer
-                .getWebComponentClass(context, tagName);
+                .getWebComponentClass(context, info.tag);
         if (!webComponentClass.isPresent()) {
-            response.sendError(404, "No such web component");
-            return true;
+            return null;
         }
-        currentWebComponentClass.set(webComponentClass.get());
-        currentWebComponentId.set("sswc_" + sswcId.incrementAndGet());
 
-        super.synchronizedHandleRequest(session, request, response);
+        info.webComponentClass = webComponentClass.get();
 
-        currentWebComponentClass.remove();
-        currentWebComponentId.remove();
-        return true;
+        return info;
     }
 
-    private void generateModule(OutputStream out, String tagName,
-            Class<? extends HasElement> webComponentClass) throws IOException {
+    private static void generateModule(OutputStream out, RequestInfo info)
+            throws IOException {
         Map<String, String> replacements = new HashMap<>();
-        replacements.put("Id", currentWebComponentId.get());
-        String tag = getTag(webComponentClass);
-        replacements.put("TagDash", tag);
+        replacements.put("Id", info.id);
+        replacements.put("TagDash", info.tag);
         replacements.put("TagCamel", SharedUtil
-                .capitalize(SharedUtil.dashSeparatedToCamelCase(tag)));
+                .capitalize(SharedUtil.dashSeparatedToCamelCase(info.tag)));
         String template = getTemplate();
         for (Entry<String, String> replacement : replacements.entrySet()) {
             template = template.replace("_" + replacement.getKey() + "_",
