@@ -1,6 +1,6 @@
 package org.vaadin.artur.sswc.app;
 
-import org.vaadin.artur.sswc.WebComponent;
+import org.vaadin.artur.sswc.internal.WebComponent;
 
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Tag;

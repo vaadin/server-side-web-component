@@ -1,4 +1,4 @@
-package org.vaadin.artur.sswc;
+package org.vaadin.artur.sswc.internal;
 
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;

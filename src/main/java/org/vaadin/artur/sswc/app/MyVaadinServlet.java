@@ -1,4 +1,4 @@
-package org.vaadin.artur.sswc;
+package org.vaadin.artur.sswc.app;
 
 import javax.servlet.annotation.WebServlet;
 

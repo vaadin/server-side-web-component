@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.vaadin.artur.sswc;
+package org.vaadin.artur.sswc.internal;
 
 import java.util.Locale;
 import java.util.Map;

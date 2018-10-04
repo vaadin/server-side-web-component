@@ -1,4 +1,4 @@
-package org.vaadin.artur.sswc;
+package org.vaadin.artur.sswc.internal;
 
 import java.lang.reflect.Field;
 import java.util.Optional;
