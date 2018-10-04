@@ -1,7 +1,6 @@
 <link rel="import" href="../../../frontend/bower_components/polymer/polymer-element.html">
 
 <dom-module id="_TagDash_">
-
   <template>
 
     <style>
@@ -11,18 +10,21 @@
     </style>
     <slot></slot>
   </template>
-
   <script>
     class _TagCamel_ extends Polymer.Element {
       static get is() {
         return '_TagDash_';
       }
       static get properties() {
-        return {
-        }
+        return  _Properties_
+        
       }
-      constructor() {
-        super();
+_PropertyMethods_
+
+      _sync(property, newValue) {
+        if (this.$server) {
+          this.$server.sync(property, newValue);
+        }
       }
       connectedCallback() {
         super.connectedCallback();
@@ -33,8 +35,12 @@
       disconnectedCallback() {
         console.log('disconnected', this);
       }
+      serverConnected() {
+        Object.keys(_TagCamel_.properties).forEach(prop => {
+          this._sync(prop, this[prop]);
+        });
+      }
     }
     customElements.define(_TagCamel_.is, _TagCamel_);
   </script>
-
 </dom-module>

@@ -17,12 +17,15 @@ package org.vaadin.artur.sswc.internal;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletContext;
 
@@ -36,6 +39,9 @@ import com.vaadin.flow.server.VaadinResponse;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.util.SharedUtil;
+
+import elemental.json.Json;
+import elemental.json.JsonObject;
 
 public class SsWcHandler extends BootstrapHandler {
 
@@ -148,11 +154,19 @@ public class SsWcHandler extends BootstrapHandler {
 
     private static void generateModule(OutputStream out, RequestInfo info)
             throws IOException {
+        Map<String, Field> fieldProperties = SSWCUI
+                .getPropertyFields(info.webComponentClass);
+        Map<String, Method> methodProperties = SSWCUI
+                .getPropertyMethods(info.webComponentClass);
         Map<String, String> replacements = new HashMap<>();
         replacements.put("Id", info.id);
         replacements.put("TagDash", info.tag);
         replacements.put("TagCamel", SharedUtil
                 .capitalize(SharedUtil.dashSeparatedToCamelCase(info.tag)));
+        replacements.put("PropertyMethods",
+                getPropertyMethods(fieldProperties, methodProperties));
+        replacements.put("Properties",
+                getPropertyDefinitions(fieldProperties, methodProperties));
         String template = getTemplate();
         for (Entry<String, String> replacement : replacements.entrySet()) {
             template = template.replace("_" + replacement.getKey() + "_",
@@ -162,8 +176,56 @@ public class SsWcHandler extends BootstrapHandler {
 
     }
 
-    private String getTag(Class<?> webComponentClass) {
-        WebComponent ann = webComponentClass.getAnnotation(WebComponent.class);
-        return ann.value();
+    private static String getPropertyDefinitions(
+            Map<String, Field> fieldProperties,
+            Map<String, Method> methodProperties) {
+        JsonObject props = Json.createObject();
+
+        for (Entry<String, Field> entry : fieldProperties.entrySet()) {
+            String property = entry.getKey();
+            Field value = entry.getValue();
+            String defaultValue = value
+                    .getAnnotation(WebComponentProperty.class).defaultValue();
+            JsonObject prop = getPropertyDefinition(property, defaultValue);
+            props.put(property, prop);
+        }
+        for (Entry<String, Method> entry : methodProperties.entrySet()) {
+            String property = entry.getKey();
+            Method value = entry.getValue();
+            String defaultValue = value
+                    .getAnnotation(WebComponentProperty.class).defaultValue();
+            JsonObject prop = getPropertyDefinition(property, defaultValue);
+            props.put(property, prop);
+        }
+        return props.toJson();
     }
+
+    private static JsonObject getPropertyDefinition(String property,
+            String defaultValue) {
+        JsonObject prop = Json.createObject();
+        prop.put("type", "String");
+        prop.put("value", defaultValue);
+        prop.put("observer", getSyncMethod(property));
+        prop.put("notify", true);
+        prop.put("reflectToAttribute", false);
+        return prop;
+
+    }
+
+    private static String getSyncMethod(String property) {
+        return "_sync_" + property;
+    }
+
+    private static String getPropertyMethods(Map<String, Field> fieldProperties,
+            Map<String, Method> methodProperties) {
+        StringBuilder methods = new StringBuilder();
+        Stream.concat(fieldProperties.keySet().stream(),
+                methodProperties.keySet().stream()).forEach(property -> {
+                    methods.append("    " + getSyncMethod(property)
+                            + "(newValue, oldValue) { this._sync('" + property
+                            + "', newValue);}\n");
+                });
+        return methods.toString();
+    }
+
 }
