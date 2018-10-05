@@ -17,9 +17,9 @@ package org.vaadin.artur.sswc.internal;
 
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
@@ -27,29 +27,33 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.HandlesTypes;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasElement;
 
+/**
+ * A registry for exported web components.
+ *
+ */
 @HandlesTypes({ WebComponent.class })
-public class WebComponentInitializer implements ServletContainerInitializer {
+public class WebComponentRegistry implements ServletContainerInitializer {
+
+    private static Map<String, Class<? extends Component>> exportedWebComponents;
+
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext ctx)
             throws ServletException {
-        System.out.println("Classes found: " + c);
+        Stream<Class<? extends Component>> componentClasses = (Stream) c
+                .stream().filter(cls -> Component.class.isAssignableFrom(cls));
 
-        Map<String, Class<? extends HasElement>> tagToWc = c.stream()
-                .collect(Collectors.toMap(
-                        type -> type.getAnnotation(WebComponent.class).value()
-                                .toLowerCase(Locale.ROOT),
-                        type -> type.asSubclass(Component.class)));
-        ctx.setAttribute(WebComponentInitializer.class.getName(), tagToWc);
+        exportedWebComponents = componentClasses
+                .collect(Collectors.toMap(type -> getTag(type), type -> type));
     }
 
-    public static Optional<Class<? extends HasElement>> getWebComponentClass(
-            ServletContext context, String tagName) {
-        @SuppressWarnings("unchecked")
-        Map<String, Class<? extends HasElement>> tagToWc = (Map<String, Class<? extends HasElement>>) context
-                .getAttribute(WebComponentInitializer.class.getName());
-
-        return Optional.ofNullable(tagToWc.get(tagName.toLowerCase()));
+    public static Class<? extends Component> getClass(String tag) {
+        return exportedWebComponents.get(tag.toLowerCase(Locale.ROOT));
     }
+
+    public static String getTag(Class<? extends Component> type) {
+        return type.getAnnotation(WebComponent.class).value()
+                .toLowerCase(Locale.ROOT);
+    }
+
 }

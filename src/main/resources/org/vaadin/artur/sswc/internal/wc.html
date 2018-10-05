@@ -1,4 +1,5 @@
-<link rel="import" href="../../../frontend/bower_components/polymer/polymer-element.html">
+<link rel="import" href="../frontend/bower_components/polymer/polymer-element.html">
+<link rel="import" href="sswcui.html">
 
 <dom-module id="_TagDash_">
   <template>
@@ -16,8 +17,8 @@
         return '_TagDash_';
       }
       static get properties() {
-        return  _Properties_
-        
+        return _Properties_
+
       }
 _PropertyMethods_
 
@@ -28,8 +29,23 @@ _PropertyMethods_
       }
       connectedCallback() {
         super.connectedCallback();
+
         // Hack needed to make Flow do lookup correctly
-        document.body.$ = { "_Id_": this };
+        const id = _TagCamel_ + "-" + _TagCamel_.id++;
+
+        document.body.$ = document.body.$ || {};
+        document.body.$[id] = this;
+
+        const poller = () => {
+          if (document.body && document.body.$server) {
+            document.body.$server.mapSsWc('_TagDash_', id);
+          } else {
+            setTimeout(poller, 10);
+          }
+        };
+
+        setTimeout(poller, 10);
+
         console.log('connected', this);
       }
       disconnectedCallback() {
@@ -41,6 +57,7 @@ _PropertyMethods_
         });
       }
     }
+    _TagCamel_.id = 0;
     customElements.define(_TagCamel_.is, _TagCamel_);
   </script>
 </dom-module>

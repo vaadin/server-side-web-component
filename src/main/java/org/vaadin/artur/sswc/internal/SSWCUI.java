@@ -48,11 +48,10 @@ public class SSWCUI extends UI {
         return Optional.empty();
     }
 
-    public void mapWc(Class<?> wcClass, String tag, String wcElementId) {
-        getPage().addHtmlImport(
-                "../sswc/element/" + wcElementId + "/" + tag + ".html");
-        Component wcInstance = (Component) Instantiator.get(this)
-                .getOrCreate(wcClass);
+    @ClientCallable
+    public void mapSsWc(String tag, String wcElementId) {
+        Component wcInstance = Instantiator.get(this)
+                .getOrCreate(WebComponentRegistry.getClass(tag));
 
         Wrapper wrapper = new Wrapper(tag);
         Element wrapperElement = wrapper.getElement();
