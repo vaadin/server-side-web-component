@@ -3,18 +3,16 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.vaadin.artur.sswc</groupId>
-    <artifactId>ss-wc</artifactId>
+    <artifactId>sswc</artifactId>
     <name>SS WC</name>
     <version>1.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <failOnMissingWebXml>false</failOnMissingWebXml>
         <flow.version>1.2-SNAPSHOT</flow.version>
-        <vaadin.version>11.0.0</vaadin.version>
     </properties>
 
     <repositories>
@@ -54,8 +52,12 @@
                 <artifactId>flow-html-components</artifactId>
                 <version>${flow.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-lumo-theme</artifactId>
+                <version>${flow.version}</version>
+            </dependency>
 
-            <!-- -->
             <dependency>
                 <groupId>com.vaadin</groupId>
                 <artifactId>flow</artifactId>
@@ -63,113 +65,24 @@
                 <scope>import</scope>
                 <version>${flow.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-bom</artifactId>
-                <type>pom</type>
-                <scope>import</scope>
-                <version>${vaadin.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-core</artifactId>
+            <artifactId>flow-server</artifactId>
         </dependency>
-
-        <!-- Added to provide logging output as Flow uses -->
-        <!-- the unbound SLF4J no-operation (NOP) logger implementation -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-lumo-theme</artifactId>
         </dependency>
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.vaadin.artur</groupId>
-            <artifactId>github-corner</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+
     </dependencies>
-
-    <build>
-        <plugins>
-            <!-- Jetty plugin for easy testing without a server -->
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.11.v20180605</version>
-                <configuration>
-                    <scanIntervalSeconds>-1</scanIntervalSeconds>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <!-- Copy .java files to package -->
-                    <execution>
-                        <id>copy-sources</id>
-                        <!-- here the phase you need -->
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/java</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>productionMode</id>
-            <activation>
-                <property>
-                    <name>vaadin.productionMode</name>
-                </property>
-            </activation>
-
-            <dependencies>
-                <dependency>
-                    <groupId>com.vaadin</groupId>
-                    <artifactId>flow-server-production-mode</artifactId>
-                </dependency>
-            </dependencies>
-
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.vaadin</groupId>
-                        <artifactId>vaadin-maven-plugin</artifactId>
-                        <version>${vaadin.version}</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>copy-production-files</goal>
-                                    <goal>package-for-production</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
