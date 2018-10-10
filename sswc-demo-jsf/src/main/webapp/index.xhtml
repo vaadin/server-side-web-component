@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<f:view transient="true" />
+<h:head>
+    <script type="text/javascript" src="#{facesContext.externalContext.requestContextPath}/frontend/bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="sswc/hello-world.html"></link>
+    <link rel="import" href="frontend/bower_components/github-corner/github-corner.html">
+    </link>
+</h:head>
+<h:body>
+	<github-corner href="https://github.com/Artur-/server-side-web-component"></github-corner>
+    <hello-world id="hello1" name="#{param.name}" style="display: block" />
+    Name: <input id="messageInput" value="#{param.name}" onkeyup="updateComponents(this.value)"></input>
+    <script type="text/javascript">
+        function updateComponents(value) {
+            document.querySelector('#hello1').name = value;
+        }
+    </script>
+</h:body>
+
+</html>

@@ -79,5 +79,6 @@
     <modules>
         <module>sswc</module>
         <module>sswc-demo-basic</module>
+        <module>sswc-demo-jsf</module>
     </modules>
 </project>
