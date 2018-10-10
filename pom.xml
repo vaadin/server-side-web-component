@@ -77,7 +77,7 @@
     </dependencyManagement>
 
     <modules>
-        <module>server-side-web-component</module>
-        <module>demo-basic</module>
+        <module>sswc</module>
+        <module>sswc-demo-basic</module>
     </modules>
 </project>
