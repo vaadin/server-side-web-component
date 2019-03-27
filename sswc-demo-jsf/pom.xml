@@ -20,11 +20,6 @@
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.vaadin.artur.sswc</groupId>
-            <artifactId>sswc</artifactId>
-            <version>${project.version} </version>
-        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>

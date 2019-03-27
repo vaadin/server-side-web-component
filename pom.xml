@@ -12,8 +12,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flow.version>1.2-SNAPSHOT</flow.version>
-        <vaadin.version>11.0.0</vaadin.version>
+        <flow.version>1.5-SNAPSHOT</flow.version>
+        <vaadin.version>13.0.2</vaadin.version>
     </properties>
 
     <repositories>
@@ -30,38 +30,7 @@
                 merged -->
             <dependency>
                 <groupId>com.vaadin</groupId>
-                <artifactId>flow-server</artifactId>
-                <version>${flow.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow-push</artifactId>
-                <version>${flow.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow-data</artifactId>
-                <version>${flow.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow-client</artifactId>
-                <version>${flow.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow-html-components</artifactId>
-                <version>${flow.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-lumo-theme</artifactId>
-                <version>${flow.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow</artifactId>
+                <artifactId>flow-bom</artifactId>
                 <type>pom</type>
                 <scope>import</scope>
                 <version>${flow.version}</version>
@@ -77,7 +46,6 @@
     </dependencyManagement>
 
     <modules>
-        <module>sswc</module>
         <module>sswc-demo-basic</module>
         <module>sswc-demo-jsf</module>
     </modules>

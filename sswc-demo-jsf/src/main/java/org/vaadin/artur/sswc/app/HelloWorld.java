@@ -1,13 +1,25 @@
 package org.vaadin.artur.sswc.app;
 
-import org.vaadin.artur.sswc.internal.WebComponent;
-import org.vaadin.artur.sswc.internal.WebComponentProperty;
-
+import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.WebComponentExporter;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.webcomponent.WebComponentDefinition;
 import com.vaadin.flow.server.VaadinRequest;
 
-@WebComponent("hello-world")
 public class HelloWorld extends Div {
+
+    @Tag("hello-world")
+    public static class HelloWorldExporter
+            implements WebComponentExporter<HelloWorld> {
+
+        @Override
+        public void define(WebComponentDefinition<HelloWorld> definition) {
+            definition.addProperty("name", "").onChange((component, value) -> {
+                component.setMessage(value);
+            });
+        }
+
+    }
 
     private Div hello;
 
@@ -20,7 +32,6 @@ public class HelloWorld extends Div {
         add(hello);
     }
 
-    @WebComponentProperty("name")
     public void setMessage(String name) {
         hello.setText("Hello " + name + "!");
     }

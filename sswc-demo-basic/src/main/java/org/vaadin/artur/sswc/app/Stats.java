@@ -5,12 +5,21 @@ import java.text.DateFormat;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
-import org.vaadin.artur.sswc.internal.WebComponent;
 
+import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.WebComponentExporter;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.webcomponent.WebComponentDefinition;
 
-@WebComponent("server-stats")
 public class Stats extends Div {
+
+    @Tag("server-stats")
+    public static class Exporter implements WebComponentExporter<Stats> {
+        @Override
+        public void define(WebComponentDefinition<Stats> definition) {
+
+        }
+    }
 
     public Stats() {
         update();

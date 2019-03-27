@@ -1,19 +1,35 @@
 package org.vaadin.artur.sswc.app;
 
-import org.vaadin.artur.sswc.internal.WebComponent;
-import org.vaadin.artur.sswc.internal.WebComponentProperty;
-
+import com.vaadin.flow.component.Tag;
+import com.vaadin.flow.component.WebComponentExporter;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.webcomponent.WebComponentDefinition;
 
-@WebComponent("my-fancy-component")
 public class MyFancyComponent extends HorizontalLayout {
 
-    private Button button;
+    @Tag("my-fancy-component")
+    public static class MyFancyComponentExporter
+            implements WebComponentExporter<MyFancyComponent> {
 
-    @WebComponentProperty(value = "response", defaultValue = "Hello")
-    private String response = "Hello";
+        @Override
+        public void define(
+                WebComponentDefinition<MyFancyComponent> definition) {
+            definition.addProperty("response", "Hello")
+                    .onChange((component, value) -> {
+                        component.response = value;
+                    });
+            definition.addProperty("message", "")
+                    .onChange((component, value) -> {
+                        component.setMessage(value);
+                    });
+        }
+
+    }
+
+    private Button button;
+    public String response;
 
     public MyFancyComponent() {
         button = new Button("Hello", e -> {
@@ -22,7 +38,6 @@ public class MyFancyComponent extends HorizontalLayout {
         add(button);
     }
 
-    @WebComponentProperty("message")
     public void setMessage(String message) {
         this.button.setText(message);
     }
